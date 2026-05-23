@@ -26,15 +26,28 @@ const allowedOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL ||
     .map((origin) => origin.trim())
     .filter(Boolean);
 
+const isAllowedOrigin = (origin) => {
+    if (!origin) {
+        return true;
+    }
+
+    if (allowedOrigins.includes(origin)) {
+        return true;
+    }
+
+    try {
+        const parsedOrigin = new URL(origin);
+        return parsedOrigin.hostname.endsWith(".vercel.app");
+    } catch {
+        return false;
+    }
+};
+
 app.set("trust proxy", 1);
 
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin) {
-            return callback(null, true);
-        }
-
-        if (!allowedOrigins.length || allowedOrigins.includes(origin)) {
+        if (isAllowedOrigin(origin)) {
             return callback(null, true);
         }
 
