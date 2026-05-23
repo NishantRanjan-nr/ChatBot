@@ -93,8 +93,9 @@ router.post("/chat", async (req, res) => {
     try {
       aiReply = await getGeminiResponse(message);
     } catch (err) {
+      console.log("Failed to generate response:", err);
       return res.status(500).json({
-        error: "Failed to generate response",
+        error: err?.message || "Failed to generate response",
       });
     }
 

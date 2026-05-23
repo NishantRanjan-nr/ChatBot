@@ -109,6 +109,14 @@
     flex-shrink: 0;
 }
 
+.chat-error {
+    width: min(680px, 88%);
+    margin: 0 auto 4px;
+    color: #ef4444;
+    font-size: 13px;
+    text-align: center;
+}
+
 
 /* ── Input Section ── */
 .user-area {

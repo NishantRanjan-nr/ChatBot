@@ -23,7 +23,8 @@ export const signup = async (req, res) => {
     });
 
     res.status(201).json({ message: "User created successfully" });
-  } catch {
+  } catch (err) {
+    console.error("Signup error:", err);
     res.status(500).json({ message: "Signup failed" });
   }
 };
