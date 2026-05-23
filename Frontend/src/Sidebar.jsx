@@ -117,7 +117,7 @@ function Sidebar(){
         </section>
         <section className='sidebar-footer'>
             <hr />
-            <p>Made by Aditya Singh</p>
+            <p>Made by Nr.</p>
         </section>
     </div>
 }
