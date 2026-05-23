@@ -73,7 +73,8 @@ function Sidebar(){
         }
     };
 
-    const logoSrc = theme === "dark" ? "src/assets/blacklogo.png": "src/assets/whitelogo.png";
+    // Use the uploaded green logo for both themes
+    const logoSrc = "src/assets/picGREEN.png";
 
     // Filter threads based on search query
     const filteredThreads = allThreads.filter(thread => 
@@ -117,7 +118,7 @@ function Sidebar(){
         </section>
         <section className='sidebar-footer'>
             <hr />
-            <p>Made by Nr.</p>
+            <p>Made by Nr</p>
         </section>
     </div>
 }
