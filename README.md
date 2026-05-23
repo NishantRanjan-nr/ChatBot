@@ -1,10 +1,10 @@
-## 🚀 Sigma-GPT
+## 🚀 Chatbot
 
 A fully hand-coded MERN stack ChatGPT clone featuring a custom frontend and backend, real-time AI-powered conversations, and a scalable, production-ready architecture.
 
 📌 Overview
 
-Sigma-GPT is a full-stack AI chat application inspired by ChatGPT, built completely from scratch using the MERN stack.
+Chatbot is a full-stack AI chat application inspired by ChatGPT, built completely from scratch using the MERN stack.
 The project focuses on clean architecture, real-world backend patterns, and a custom UI, making it ideal for learning, experimentation, and real-world scalability.
 
 Unlike template-based clones, every component — frontend, backend, APIs, and logic — is hand-written.
@@ -53,7 +53,7 @@ AI response generation using a custom utility layer (Gemini/OpenAI-style abstrac
 🔹 Fully hand-coded (no boilerplates)
 
 📁 Project Structure
-sigma-gpt/
+chatbot/
 │
 ├── Backend/
 │   ├── models/
@@ -80,8 +80,8 @@ sigma-gpt/
 
 ⚙️ Setup & Installation
 1️⃣ Clone the repository
-git clone https://github.com/TsTarK85/sigma-gpt.git
-cd sigma-gpt
+git clone https://github.com/NishantRanjan-nr/ChatBot.git
+cd ChatBot
 
 2️⃣ Backend Setup
 cd Backend

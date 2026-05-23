@@ -8,6 +8,7 @@ function ChatWindow(){
     let {prompt, setPrompt, reply, setReply, currThreadId, prevChats, setPrevChats, setNewChat, theme, toggleTheme, setIsAuth, isAuth, setShowAuth, authChecked, user, setShowProfile, setShowSettings} = useContext(MyContext);
     let [loading, setLoading] = useState(false);
     let [isOpen, isSetOpen] = useState(false);
+    let [chatError, setChatError] = useState("");
 
     const dropdownRef = useRef(null);
     useEffect(() => {
@@ -54,7 +55,12 @@ function ChatWindow(){
             return;
         }
 
+        if (!prompt.trim()) {
+            return;
+        }
+
         setLoading(true);
+        setChatError("");
         setNewChat(false);
         const options = {
             method: "POST",
@@ -73,9 +79,16 @@ function ChatWindow(){
 
             let res = await response.json();
             console.log(res);
-            setReply(res.reply);
+            if (!response.ok) {
+                setReply(null);
+                setChatError(res.error || "Failed to generate response");
+            } else {
+                setReply(res.reply);
+            }
         } catch(err){
             console.log(`Some error occurred - ${err}`);
+            setReply(null);
+            setChatError("Server not reachable");
         }
 
         setLoading(false);
@@ -118,7 +131,7 @@ function ChatWindow(){
     return <div className='chatwindow'>
         <div className="chat-nav">
             <span className='chat-logo'>
-                <div>SigmaGPT <i className="fa-solid fa-angle-down"></i></div>
+                <div>Chatbot <i className="fa-solid fa-angle-down"></i></div>
             </span>
             <span className="theme-and-profile">
                 <span className="theme-toggle" onClick={toggleTheme}>
@@ -166,6 +179,8 @@ function ChatWindow(){
         <div className="loader-container">
             <ScaleLoader color='var(--text-color)' loading={loading} height={28} width={3} radius={3} margin={3}></ScaleLoader>
         </div>
+
+        {chatError && <p className="chat-error">{chatError}</p>}
 
         <div className="user-area">
             <div className="user-input">

@@ -48,7 +48,7 @@ function Auth() {
         className="auth-card"
         onClick={(e) => e.stopPropagation()} 
       >
-        <h1>SigmaGPT</h1>
+        <h1>Chatbot</h1>
 
         <p className="subtitle">
           {isLogin ? "Welcome back" : "Create your account"}
