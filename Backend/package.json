@@ -1,5 +1,6 @@
 {
   "type": "module",
+  "name": "chatbot-backend",
   "engines": {
     "node": ">=20.19.0"
   },
