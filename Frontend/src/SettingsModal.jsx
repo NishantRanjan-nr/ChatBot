@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react';
 import './public/SettingsModal.css';
 import { MyContext } from './MyContext';
+import { buildApiUrl, getErrorMessage } from './api.js';
 
 function SettingsModal() {
     const { 
@@ -10,6 +11,7 @@ function SettingsModal() {
     } = useContext(MyContext);
     
     const [activeTab, setActiveTab] = useState("general");
+    const [requestError, setRequestError] = useState("");
 
     const tabs = [
         { id: "general", label: "General", icon: "fa-gear" },
@@ -27,25 +29,34 @@ function SettingsModal() {
     };
 
     const handleSignOut = async () => {
+        setRequestError("");
         try {
-            await fetch("http://localhost:8080/api/auth/logout", {
+            const response = await fetch(buildApiUrl('/api/auth/logout'), {
                 method: "POST",
                 credentials: "include"
             });
+
+            if (!response.ok) {
+                setRequestError(await getErrorMessage(response, 'Failed to sign out'));
+                return;
+            }
+
             setIsAuth(false);
             setShowSettings(false);
         } catch (err) {
             console.error("Sign out error", err);
+            setRequestError(err?.message || 'Failed to sign out');
         }
     };
 
     const handleDeleteAccount = async () => {
+        setRequestError("");
         if (!window.confirm("Are you sure you want to delete your account? This action is irreversible.")) {
             return;
         }
 
         try {
-            const response = await fetch("http://localhost:8080/api/auth/profile", {
+            const response = await fetch(buildApiUrl('/api/auth/profile'), {
                 method: "DELETE",
                 credentials: "include"
             });
@@ -55,11 +66,11 @@ function SettingsModal() {
                 setShowSettings(false);
                 alert("Account successfully deleted.");
             } else {
-                alert("Failed to delete account");
+                setRequestError(await getErrorMessage(response, 'Failed to delete account'));
             }
         } catch (err) {
             console.error("Delete account error", err);
-            alert("Error deleting account");
+            setRequestError(err?.message || 'Error deleting account');
         }
     };
 
@@ -164,6 +175,7 @@ function SettingsModal() {
                 
                 <div className="settings-content-wrapper">
                     <h2>{activeTab === 'general' ? 'General' : 'Account'}</h2>
+                    {requestError && <p className="error">{requestError}</p>}
                     {activeTab === 'general' ? renderGeneralTab() : renderAccountTab()}
                 </div>
             </div>

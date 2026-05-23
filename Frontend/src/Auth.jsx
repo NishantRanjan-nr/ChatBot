@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { MyContext } from "./MyContext.jsx";
+import { buildApiUrl, getErrorMessage } from "./api.js";
 import "./public/Auth.css";
 
 function Auth() {
@@ -16,8 +17,8 @@ function Auth() {
     setError("");
 
     const endpoint = isLogin
-      ? "http://localhost:8080/api/auth/login"
-      : "http://localhost:8080/api/auth/signup";
+      ? buildApiUrl("/api/auth/login")
+      : buildApiUrl("/api/auth/signup");
 
     try {
       const res = await fetch(endpoint, {
@@ -27,16 +28,14 @@ function Auth() {
         body: JSON.stringify({ email, password })
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
-        setError(data.message || "Something went wrong");
+        setError(await getErrorMessage(res, "Something went wrong"));
       } else {
         setIsAuth(true);
         setShowAuth(false);
       }
-    } catch {
-      setError("Server not reachable");
+    } catch (err) {
+      setError(err?.message || "Server not reachable");
     }
 
     setLoading(false);

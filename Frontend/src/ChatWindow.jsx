@@ -3,6 +3,7 @@ import Chat from './Chat.jsx';
 import { MyContext } from './MyContext.jsx';
 import { useContext, useState, useEffect, useRef } from 'react';
 import {ScaleLoader}  from 'react-spinners';
+import { buildApiUrl, getErrorMessage } from './api.js';
 
 function ChatWindow(){
     let {prompt, setPrompt, reply, setReply, currThreadId, prevChats, setPrevChats, setNewChat, theme, toggleTheme, setIsAuth, isAuth, setShowAuth, authChecked, user, setShowProfile, setShowSettings} = useContext(MyContext);
@@ -75,20 +76,21 @@ function ChatWindow(){
         };
 
         try{
-            const response = await fetch("http://localhost:8080/api/chat", options);
+            const response = await fetch(buildApiUrl('/api/chat'), options);
 
-            let res = await response.json();
-            console.log(res);
             if (!response.ok) {
+                const errorMessage = await getErrorMessage(response, 'Failed to generate response');
                 setReply(null);
-                setChatError(res.error || "Failed to generate response");
+                setChatError(errorMessage);
             } else {
+                let res = await response.json();
+                console.log(res);
                 setReply(res.reply);
             }
         } catch(err){
             console.log(`Some error occurred - ${err}`);
             setReply(null);
-            setChatError("Server not reachable");
+            setChatError(err?.message || 'Server not reachable');
         }
 
         setLoading(false);
@@ -119,10 +121,20 @@ function ChatWindow(){
 
 
     const logout = async() => {
-        await fetch("http://localhost:8080/api/auth/logout", {
-            method: "POST",
-            credentials: "include"
-        });
+        try {
+            const response = await fetch(buildApiUrl('/api/auth/logout'), {
+                method: 'POST',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                setChatError(await getErrorMessage(response, 'Unable to logout right now'));
+                return;
+            }
+        } catch (err) {
+            setChatError(err?.message || 'Unable to logout right now');
+            return;
+        }
 
         setIsAuth(false);
         isSetOpen(false);

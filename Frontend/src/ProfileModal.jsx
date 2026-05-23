@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react';
 import './public/ProfileModal.css';
 import { MyContext } from './MyContext';
+import { buildApiUrl, getErrorMessage } from './api.js';
 
 const EMOJI_LIST = ["😀", "😎", "🤓", "😊", "🤩", "🚀", "🐼", "🦊", "🐶", "🐱", "🦁", "🐸", "🐧", "🦄"];
 
@@ -16,6 +17,7 @@ function ProfileModal() {
     const [showVerifyBox, setShowVerifyBox] = useState(false);
     const [verifyPasswordInput, setVerifyPasswordInput] = useState("");
     const [verifyError, setVerifyError] = useState("");
+    const [saveError, setSaveError] = useState("");
     
     const [loading, setLoading] = useState(false);
 
@@ -32,7 +34,7 @@ function ProfileModal() {
         }
 
         try {
-            const response = await fetch("http://localhost:8080/api/auth/verify-password", {
+            const response = await fetch(buildApiUrl('/api/auth/verify-password'), {
                 method: "POST",
                 credentials: "include",
                 headers: {
@@ -46,23 +48,24 @@ function ProfileModal() {
                 setShowVerifyBox(false);
                 setVerifyPasswordInput("");
             } else {
-                const data = await response.json();
-                setVerifyError(data.message || "Invalid password");
+                setVerifyError(await getErrorMessage(response, "Invalid password"));
             }
         } catch (err) {
-            setVerifyError("Failed to verify");
+            setVerifyError(err?.message || "Failed to verify");
         }
     };
 
     const handleSaveProfile = async () => {
         setLoading(true);
+        setSaveError("");
+
         try {
             const payload = { email, emoji };
             if (passwordUnlocked && newPassword) {
                 payload.password = newPassword;
             }
 
-            const response = await fetch("http://localhost:8080/api/auth/profile", {
+            const response = await fetch(buildApiUrl('/api/auth/profile'), {
                 method: "PUT",
                 credentials: "include",
                 headers: {
@@ -76,11 +79,11 @@ function ProfileModal() {
                 setUser(updatedUser);
                 setShowProfile(false);
             } else {
-                alert("Failed to update profile");
+                setSaveError(await getErrorMessage(response, "Failed to update profile"));
             }
         } catch (err) {
             console.error("Error updating profile", err);
-            alert("Error updating profile");
+            setSaveError(err?.message || "Error updating profile");
         } finally {
             setLoading(false);
         }
@@ -151,6 +154,8 @@ function ProfileModal() {
                 <p className="profile-info-text">
                     Your profile helps people recognize you. Your email is used for login.
                 </p>
+
+                {saveError && <p className="error">{saveError}</p>}
 
                 <div className="profile-actions">
                     <button className="btn-cancel" onClick={() => setShowProfile(false)}>Cancel</button>

@@ -9,6 +9,7 @@ import './index.css';
 import Auth from './Auth.jsx';
 import ProfileModal from './ProfileModal.jsx';
 import SettingsModal from './SettingsModal.jsx';
+import { buildApiUrl } from './api.js';
 
 
 function App() {
@@ -55,7 +56,7 @@ function App() {
   useEffect(() => {
     const checkAuth = async() => {
       try{
-        const response = await fetch("http://localhost:8080/api/auth/me", {
+        const response = await fetch(buildApiUrl('/api/auth/me'), {
           credentials: "include"
         });
 

@@ -20,17 +20,25 @@ const PORT = process.env.PORT || 8080;
 // Middleware
 app.use(cookieParser());
 app.use(express.json());
-const allowedOrigins = new Set([
-    "http://localhost:5173",
-    "http://localhost:5174"
-]);
+
+const allowedOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+app.set("trust proxy", 1);
+
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.has(origin)) {
+        if (!origin) {
             return callback(null, true);
         }
 
-        callback(new Error(`CORS blocked for origin: ${origin}`));
+        if (!allowedOrigins.length || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        return callback(new Error(`CORS blocked for origin: ${origin}`));
     },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -39,6 +47,10 @@ app.use(cors({
 
 
 // Routes
+app.get("/", (req, res) => {
+    res.send("Backend is running");
+});
+
 app.use("/api", chatRoutes);
 app.use("/api/auth", authRoutes);
 

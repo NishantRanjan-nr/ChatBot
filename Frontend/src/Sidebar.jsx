@@ -2,19 +2,30 @@ import './public/Sidebar.css'
 import { useContext, useState, useEffect } from 'react';
 import { MyContext } from './MyContext.jsx';
 import {v1 as uuidv1} from 'uuid';
+import { buildApiUrl, getErrorMessage } from './api.js';
 
 
 function Sidebar(){
-    const {allThreads, setAllThreads, currThreadId, newChat, setNewChat, setPrompt, setReply, setCurrThreadId, setPrevChats, theme} = useContext(MyContext);
+    const {allThreads, setAllThreads, currThreadId, newChat, setNewChat, setPrompt, setReply, setCurrThreadId, setPrevChats, theme, isAuth, authChecked} = useContext(MyContext);
     
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
 
     const getAllThreads = async() => {
+        if (!authChecked || !isAuth) {
+            setAllThreads([]);
+            return;
+        }
+
         try{
-            let response = await fetch("http://localhost:8080/api/thread", {
+            let response = await fetch(buildApiUrl('/api/thread'), {
                 credentials: "include"
             });
+
+            if (!response.ok) {
+                throw new Error(await getErrorMessage(response, 'Failed to fetch chats'));
+            }
+
             let res = await response.json();
             let filterData = res.map(thread => ({threadId: thread.threadId, title: thread.title}));
             setAllThreads(filterData);
@@ -26,7 +37,7 @@ function Sidebar(){
 
     useEffect(() => {
         getAllThreads();
-    }, [currThreadId]);
+    }, [currThreadId, isAuth, authChecked]);
 
 
     const createNewChat = () => {
@@ -40,9 +51,14 @@ function Sidebar(){
     const showThread = async(newThreadId) => {
         setCurrThreadId(newThreadId);
         try{
-            let response = await fetch(`http://localhost:8080/api/thread/${newThreadId}`, {
+            let response = await fetch(buildApiUrl(`/api/thread/${newThreadId}`), {
                 credentials: "include"
             });
+
+            if (!response.ok) {
+                throw new Error(await getErrorMessage(response, 'Failed to load chat'));
+            }
+
             let res = await response.json();
             console.log(res);
             setPrevChats(res);
@@ -55,10 +71,15 @@ function Sidebar(){
 
     const deleteThread = async(delThreadId) => {
         try{
-            let response = await fetch(`http://localhost:8080/api/thread/${delThreadId}`, {
+            let response = await fetch(buildApiUrl(`/api/thread/${delThreadId}`), {
                 method: "DELETE",
                 credentials: "include"
             });
+
+            if (!response.ok) {
+                throw new Error(await getErrorMessage(response, 'Failed to delete chat'));
+            }
+
             let res = await response.json();
             console.log(res);
 

@@ -2,6 +2,14 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwtToken from "../utils/generateToken.js";
 
+const isProduction = process.env.NODE_ENV === "production";
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
+  maxAge: 24 * 60 * 60 * 1000
+};
+
 export const signup = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -45,12 +53,7 @@ export const login = async (req, res) => {
 
     const token = jwtToken(user._id);
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000
-    });
+    res.cookie("token", token, cookieOptions);
 
     res.json({ message: "Login successful" });
   } catch {
@@ -59,7 +62,11 @@ export const login = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax"
+  });
   res.json({ message: "Logged out successfully" });
 };
 
@@ -123,7 +130,11 @@ export const deleteAccount = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
     
-    res.clearCookie("token");
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax"
+    });
     res.json({ message: "Account deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: "Deletion failed" });
