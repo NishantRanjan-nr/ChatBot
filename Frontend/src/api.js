@@ -1,4 +1,4 @@
-export const API_URL = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
+export const API_URL = (import.meta.env.VITE_API_URL || "https://chatbot-xvgz.onrender.com").replace(/\/$/, "");
 
 export const buildApiUrl = (path) => {
   if (!API_URL) {
