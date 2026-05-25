@@ -1,6 +1,6 @@
 ## 🚀 Chatbot
 
-A fully hand-coded MERN stack ChatGPT clone featuring a custom frontend and backend, real-time AI-powered conversations, and a scalable, production-ready architecture.
+A MERN stack ChatGPT clone featuring a custom frontend and backend, real-time AI-powered conversations, and a scalable, production-ready architecture.
 
 📌 Overview
 
